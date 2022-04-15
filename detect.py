@@ -1,6 +1,7 @@
 import cv2
 import math
 import argparse
+import os.path
 
 def markFace(net, frame, conf_threshold=0.7):
     frameOpencvDnn=frame.copy()
@@ -28,12 +29,12 @@ parser.add_argument('--image')
 
 args=parser.parse_args()
 
-faceProto="opencv_face_detector.pbtxt"
-faceModel="opencv_face_detector_uint8.pb"
-ageProto="age_deploy.prototxt"
-ageModel="age_net.caffemodel"
-genderProto="gender_deploy.prototxt"
-genderModel="gender_net.caffemodel"
+faceProto="files/opencv_face_detector.pbtxt"
+faceModel="files/opencv_face_detector_uint8.pb"
+ageProto="files/age_deploy.prototxt"
+ageModel="files/age_net.caffemodel"
+genderProto="files/gender_deploy.prototxt"
+genderModel="files/gender_net.caffemodel"
 
 MODEL_MEAN_VALUES=(78.4263377603, 87.7689143744, 114.895847746)
 ageRange=['(0-2)', '(4-6)', '(8-12)', '(15-20)', '(25-32)', '(38-43)', '(48-53)', '(60-100)']
@@ -43,7 +44,10 @@ faceNet=cv2.dnn.readNet(faceModel,faceProto)
 ageNet=cv2.dnn.readNet(ageModel,ageProto)
 genderNet=cv2.dnn.readNet(genderModel,genderProto)
 
-video=cv2.VideoCapture(args.image if args.image else 0)
+if not os.path.exists(args.image):
+    print("Image '{0}' doesn't exist...!!".format(args.image))
+
+video=cv2.VideoCapture(args.image)
 padding=20
 while cv2.waitKey(1)<0 :
     hasFrame,frame=video.read()
